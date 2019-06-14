@@ -23,13 +23,13 @@ function dockerCompose(manifest, params) {
   let service = {};
   if (isCore) {
     service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME;
-    if (manifest.image.privileged) {
-      service.privileged = true;
-    }
   } else {
     service.container_name = CONTAINER_NAME_PREFIX + PACKAGE_NAME;
   }
-
+  
+  if (manifest.image.privileged) {
+    service.privileged = true;
+  }
   // Image name
   service.image = manifest.name + ":" + manifest.version;
   if (manifest.image.restart) {
