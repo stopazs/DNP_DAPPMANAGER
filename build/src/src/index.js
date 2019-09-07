@@ -206,7 +206,7 @@ connection.onclose = (reason, details) => {
 };
 
 connection.open();
-logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+logs.info(`Avado: Attempting WAMP connection to ${url}, realm: ${realm}`);
 
 /**
  * Initials calls

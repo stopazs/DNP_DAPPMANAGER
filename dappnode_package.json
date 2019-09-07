@@ -1,13 +1,13 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.2.1",
-  "description": "Dappnode package responsible for providing the DappNode Package Manager",
-  "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
+  "version": "10.0.1",
+  "description": "AVADO Package Manager",
+  "avatar": "/ipfs/QmUvPdkonana7R1BbHBi2uJCEMgtjQeF7b4Lxgk7jZbgxU",
   "type": "dncore",
   "image": {
-    "path": "",
-    "hash": "",
-    "size": "",
+    "path": "dappmanager.dnp.dappnode.eth_10.0.1.tar.xz",
+    "hash": "/ipfs/QmY9hMj49z9eqYFTZx7Fjm924eierSL4RDaaBiWJamsENf",
+    "size": 63720996,
     "volumes": [
       "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
@@ -17,22 +17,15 @@
     "subnet": "172.33.0.0/16",
     "ipv4_address": "172.33.1.7"
   },
-  "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-  "contributors": [
-    "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
-    "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
+  "author": "AVADO",
+  "contributors": [],
+  "keywords": [
+    "DAppNodeCore",
+    "Manager",
+    "Installer"
   ],
-  "keywords": ["DAppNodeCore", "Manager", "Installer"],
   "links": {
-    "ui": "http://my.dappnode/",
-    "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dappnode/DNP_DAPPMANAGER"
-  },
-  "bugs": {
-    "url": "https://github.com/dappnode/DNP_DAPPMANAGER/issues"
+    "ui": "http://my.dappnode/"
   },
   "license": "GPL-3.0"
 }

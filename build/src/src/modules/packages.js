@@ -38,12 +38,20 @@ async function download({ pkg, id }) {
     validate.path(getPath.manifest(name, params, isCore)),
     generate.manifest(manifest)
   );
+  const dockerCompose = generate.dockerCompose(manifest, params);
+  logUi({ id, name, message: dockerCompose });
+
   await writeFile(
     validate.path(getPath.dockerCompose(name, params, isCore)),
-    generate.dockerCompose(manifest, params)
+    dockerCompose
   );
 
-  logUi({ id, name, message: "Starting download..." });
+  await writeFile(
+      "/tmp/lastCompose",
+    dockerCompose
+  );
+
+  logUi({ id, name, message: "OK - Starting download..." });
   const imagePath = validate.path(
     getPath.image(name, imageName, params, isCore)
   );
