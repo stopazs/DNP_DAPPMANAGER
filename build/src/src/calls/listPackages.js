@@ -8,6 +8,7 @@ const docker = require("modules/docker");
 const parseDockerSystemDf = require("utils/parseDockerSystemDf");
 const getPath = require("utils/getPath");
 const envsHelper = require("utils/envsHelper");
+const db = require("../db");
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
@@ -15,11 +16,11 @@ const envsHelper = require("utils/envsHelper");
 let isRunning;
 let cacheResult;
 async function dockerSystemDf() {
-  if (isRunning && cacheResult) return cacheResult;
-  isRunning = true;
-  cacheResult = await docker.systemDf();
-  isRunning = false;
-  return cacheResult;
+    if (isRunning && cacheResult) return cacheResult;
+    isRunning = true;
+    cacheResult = await docker.systemDf();
+    isRunning = false;
+    return cacheResult;
 }
 
 /**
@@ -60,48 +61,58 @@ async function dockerSystemDf() {
  * }, ... ]
  */
 const listPackages = async () => {
-  let dnpList = await dockerList.listContainers();
+    let dnpList = await dockerList.listContainers();
 
-  // Append volume info
-  // This call can fail because of:
-  //   Error response from daemon: a disk usage operation is already running
-  try {
-    const dockerSystemDfData = await dockerSystemDf();
-    dnpList = parseDockerSystemDf({ data: dockerSystemDfData, dnpList });
-  } catch (e) {
-    logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
-  }
-
-  // Append envFile and manifest
-  dnpList.map(dnp => {
-    // Add env info, only if there are ENVs
+    // Append volume info
+    // This call can fail because of:
+    //   Error response from daemon: a disk usage operation is already running
     try {
-      const envs = envsHelper.load(dnp.name, dnp.isCore);
-      if (Object.keys(envs).length) dnp.envs = envs;
+        const dockerSystemDfData = await dockerSystemDf();
+        dnpList = parseDockerSystemDf({ data: dockerSystemDfData, dnpList });
     } catch (e) {
-      logs.warn(`Error appending ${(dnp || {}).name} envs: ${e.stack}`);
+        logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
     }
 
-    // Add manifest
-    try {
-      const manifestPath = getPath.manifest(dnp.name, params, dnp.isCore);
-      if (fs.existsSync(manifestPath)) {
-        const manifestFileData = fs.readFileSync(manifestPath, "utf8");
+    // Append envFile and manifest
+    dnpList = await Promise.all(dnpList.map(async dnp => {
+        // Add env info, only if there are ENVs
         try {
-          dnp.manifest = JSON.parse(manifestFileData);
+            const envs = envsHelper.load(dnp.name, dnp.isCore);
+            if (Object.keys(envs).length) dnp.envs = envs;
         } catch (e) {
-          // Silence parsing errors
+            logs.warn(`Error appending ${(dnp || {}).name} envs: ${e.stack}`);
         }
-      }
-    } catch (e) {
-      logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
-    }
-  });
 
-  return {
-    message: `Listing ${dnpList.length} packages`,
-    result: dnpList
-  };
+        // Add manifest
+        try {
+            const manifestPath = getPath.manifest(dnp.name, params, dnp.isCore);
+            if (fs.existsSync(manifestPath)) {
+                const manifestFileData = fs.readFileSync(manifestPath, "utf8");
+                try {
+                    dnp.manifest = JSON.parse(manifestFileData);
+                } catch (e) {
+                    // Silence parsing errors
+                }
+            }
+        } catch (e) {
+            logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
+        }
+
+        // Add autoupdate
+        const dbKey = `autoupdate-${dnp.name.replace(/\./g, "_")}`;
+        const autoUpdateDB = await db.get(dbKey);
+        const autoUpdate = autoUpdateDB === undefined ? false : autoUpdateDB;
+        dnp.manifest.autoupdate = autoUpdate;
+
+        return dnp;
+    }));
+
+
+
+    return {
+        message: `Listing ${dnpList.length} packages`,
+        result: dnpList
+    };
 };
 
 module.exports = listPackages;
