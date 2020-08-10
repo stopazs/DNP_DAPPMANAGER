@@ -104,9 +104,10 @@ const listPackages = async () => {
             const autoUpdateDB = await db.get(dbKey);
             const autoUpdateDefault = dnp && dnp.manifest && dnp.manifest.autoupdate === true;
             const autoUpdate = autoUpdateDB === undefined ? autoUpdateDefault : autoUpdateDB;
-            if (dnp && dnp.manifest) {
-                dnp.manifest.autoupdate = autoUpdate;
+            if (dnp && !dnp.manifest) {
+                dnp.manifest = {};  // example installed CORE packages have no manifest
             }
+            dnp.manifest.autoupdate = autoUpdate;
         } catch (e) {
             logs.warn(`Error appending ${(dnp || {}).name} autoupdate: ${e.message}`);
         }
