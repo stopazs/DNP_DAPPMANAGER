@@ -97,13 +97,16 @@ const listPackages = async () => {
         } catch (e) {
             logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
         }
-        
+
         try {
             // Add autoupdate
             const dbKey = `autoupdate-${dnp.name.replace(/\./g, "_")}`;
             const autoUpdateDB = await db.get(dbKey);
-            const autoUpdate = autoUpdateDB === undefined ? false : autoUpdateDB;
-            dnp.manifest.autoupdate = autoUpdate;
+            const autoUpdateDefault = dnp && dnp.manifest && dnp.manifest.autoupdate === true;
+            const autoUpdate = autoUpdateDB === undefined ? autoUpdateDefault : autoUpdateDB;
+            if (dnp && dnp.manifest) {
+                dnp.manifest.autoupdate = autoUpdate;
+            }
         } catch (e) {
             logs.warn(`Error appending ${(dnp || {}).name} autoupdate: ${e.message}`);
         }
