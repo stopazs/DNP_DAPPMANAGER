@@ -1,8 +1,3 @@
-const fs = require("fs");
-const getPath = require("utils/getPath");
-const restartPatch = require("modules/restartPatch");
-const params = require("params");
-const docker = require("modules/docker");
 const { eventBus, eventBusTag } = require("eventBus");
 const db = require("../db");
 

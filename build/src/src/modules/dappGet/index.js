@@ -1,9 +1,9 @@
-const fetch = require("./fetch");
-const aggregate = require("./aggregate");
-const resolve = require("./resolve");
+// const fetch = require("./fetch");
+// const aggregate = require("./aggregate");
+// const resolve = require("./resolve");
 const dappGetBasic = require("./basic");
-const dockerList = require("modules/dockerList");
-const logs = require("logs.js")(module);
+// const dockerList = require("modules/dockerList");
+// const logs = require("logs.js")(module);
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -46,61 +46,68 @@ const logs = require("logs.js")(module);
  *   Checked 256/256 possible states.'
  * }
  */
-async function dappGet(req, options = {}) {
+async function dappGet(req) {
   /**
    * If BYPASS_RESOLVER=true, use the dappGet basic.
    * It will not use the fetch or resolver module and only
    * fetch the first level dependencies of the request
    */
-  if (options.BYPASS_RESOLVER) return await dappGetBasic(req);
+ 
+  const res = await dappGetBasic(req);
+//   console.log("dappget:");
+//   console.log(req);
+//   console.log(res);
+  return res;
+  
+//   if (options.BYPASS_RESOLVER) return await dappGetBasic(req);
 
-  const dnpList = await dockerList.listContainers();
+//   const dnpList = await dockerList.listContainers();
 
-  // Aggregate
-  let dnps;
-  try {
-    // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-    dnps = await aggregate({ req, dnpList, fetch });
-  } catch (e) {
-    logs.error(`dappGet/aggregate error: ${e.stack}`);
-    e.message = `dappGet could not resolve request ${req.name}@${
-      req.ver
-    }, error on aggregate stage: ${e.message}`;
-    throw e;
-  }
+//   // Aggregate
+//   let dnps;
+//   try {
+//     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
+//     dnps = await aggregate({ req, dnpList, fetch });
+//   } catch (e) {
+//     logs.error(`dappGet/aggregate error: ${e.stack}`);
+//     e.message = `dappGet could not resolve request ${req.name}@${
+//       req.ver
+//     }, error on aggregate stage: ${e.message}`;
+//     throw e;
+//   }
 
-  // Resolve
-  let result;
-  try {
-    result = resolve(dnps);
-  } catch (e) {
-    logs.error(`dappGet/resolve error: ${e.stack}`);
-    e.message = `dappGet could not resolve request ${req.name}@${
-      req.ver
-    }, error on resolve stage: ${e.message}`;
-    throw e;
-  }
+//   // Resolve
+//   let result;
+//   try {
+//     result = resolve(dnps);
+//   } catch (e) {
+//     logs.error(`dappGet/resolve error: ${e.stack}`);
+//     e.message = `dappGet could not resolve request ${req.name}@${
+//       req.ver
+//     }, error on resolve stage: ${e.message}`;
+//     throw e;
+//   }
 
-  const { success, message, state } = result;
-  // If the request could not be resolved, output a formated error:
-  if (!success) throw Error(`Could not find compatible state. ${message}`);
+//   const { success, message, state } = result;
+//   // If the request could not be resolved, output a formated error:
+//   if (!success) throw Error(`Could not find compatible state. ${message}`);
 
-  // Otherwise, format the output
-  let alreadyUpdated = {};
-  dnpList.forEach(dnp => {
-    if (state[dnp.name] && state[dnp.name] === dnp.version) {
-      // DNP is already updated.
-      // Remove from the success object and add it to the alreadyUpdatedd
-      alreadyUpdated[dnp.name] = state[dnp.name];
-      delete state[dnp.name];
-    }
-  });
+//   // Otherwise, format the output
+//   let alreadyUpdated = {};
+//   dnpList.forEach(dnp => {
+//     if (state[dnp.name] && state[dnp.name] === dnp.version) {
+//       // DNP is already updated.
+//       // Remove from the success object and add it to the alreadyUpdatedd
+//       alreadyUpdated[dnp.name] = state[dnp.name];
+//       delete state[dnp.name];
+//     }
+//   });
 
-  return {
-    message,
-    state,
-    alreadyUpdated
-  };
+//   return {
+//     message,
+//     state,
+//     alreadyUpdated
+//   };
 }
 
 module.exports = dappGet;
