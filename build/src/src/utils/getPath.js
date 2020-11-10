@@ -44,12 +44,19 @@ module.exports = {
   dockerComposeSmart: (dnpName, params) => {
     if (!dnpName) throw Error("dnpName must be defined");
     if (!params) throw Error("params must be defined");
+    // // First check for core docker-compose
+    // let DOCKERCOMPOSE_PATH = getDockerComposePath(dnpName, params, true);
+    // if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
+    // // Then check for dnp docker-compose
+    // return getDockerComposePath(dnpName, params, false);
+
     // First check for core docker-compose
-    let DOCKERCOMPOSE_PATH = getDockerComposePath(dnpName, params, true);
+    let DOCKERCOMPOSE_PATH = getDockerComposePath(dnpName, params, false);
     if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
     // Then check for dnp docker-compose
-    return getDockerComposePath(dnpName, params, false);
-  },
+    return getDockerComposePath(dnpName, params, true);
+    
+},
 
   envFile: (dnpName, params, isCore) => {
     if (!dnpName) throw Error("dnpName must be defined");

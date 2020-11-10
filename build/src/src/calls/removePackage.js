@@ -23,10 +23,20 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
 
   const packageRepoDir = getPath.packageRepoDir(id, params);
 
+  logs.info(
+    `Removing package from packageRepoDir ${packageRepoDir} params=` + JSON.stringify(params)
+  );
+
+
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
+
+  logs.info(
+    `Removing package from dockerComposePath ${dockerComposePath}`
+  );
+
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
     throw Error("The installer cannot be restarted");
@@ -69,16 +79,30 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
     });
   }
 
+  logs.info(
+    `removing containers from ${dockerComposePath}`
+  );
+
   // Remove container (and) volumes
   await docker.compose.down(dockerComposePath, {
     volumes: Boolean(deleteVolumes)
   });
+
+  logs.info(
+    `removing package dir`
+  );
+
   // Remove DNP folder and files
-  await shell(`rm -r ${packageRepoDir}`);
+  await shell(`rm -rf ${packageRepoDir}`);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
   eventBus.emit(eventBusTag.packageModified);
+
+
+  logs.info(
+    `removed package ${id}`
+  );
 
   return {
     message: `Removed package: ${id}`,

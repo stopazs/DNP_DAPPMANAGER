@@ -31,5 +31,6 @@ module.exports = {
   restartPackageVolumes: require("./restartPackageVolumes"),
   togglePackage: require("./togglePackage"),
   updatePackageEnv: require("./updatePackageEnv"),
-  setAutoUpdate: require("./setAutoUpdate")
+  setAutoUpdate: require("./setAutoUpdate"),
+  rebootHost: require("./rebootHost"),
 };

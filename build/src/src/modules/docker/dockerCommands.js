@@ -84,6 +84,8 @@ const docker = {
   // Searches for semver
   images: () => `docker images --format "{{.Repository}}:{{.Tag}}"`,
 
+  rebootHost: () => `docker run --privileged  --net=host --pid=host --ipc=host --volume /:/host  busybox  chroot /host reboot`,
+
   rmi: imgsToDelete => `docker rmi ${imgsToDelete.join(" ")}`,
 
   rmOldSemverImages: packageName =>
