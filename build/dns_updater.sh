@@ -54,3 +54,22 @@ echo "show" >> /tmp/nsupdate_avado.txt
 echo "send" >> /tmp/nsupdate_avado.txt
 
 nsupdate -v /tmp/nsupdate_avado.txt
+
+
+echo "server 172.33.1.2" > /tmp/nsupdate_avadopackage_com.txt
+echo "debug yes" >> /tmp/nsupdate_avadopackage_com.txt
+echo "zone avadopackage.com." >> /tmp/nsupdate_avadopackage_com.txt
+for container in $(docker inspect -f '{{.Name}};{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q -f "name=DAppNodePackage-"))
+do
+    name=$(echo $container | awk -F ';' '{print $1}'| sed 's/DAppNodePackage-//g'| sed 's/\.dappnode\.eth//g' |  sed 's/\.dnp//g' |  sed 's/\.public//g'|  sed 's/\.avado//g' | tr -d '/_')
+    ip=$(echo $container | awk -F ';' '{print $2}'| tr -d '/_')
+    if [ ! -z "$ip" ]
+    then
+    	echo "update delete ${name}.avadopackage.com A" >> /tmp/nsupdate_avadopackage_com.txt
+    	echo "update add ${name}.avadopackage.com 60 A ${ip}" >> /tmp/nsupdate_avadopackage_com.txt
+    fi
+done
+echo "show" >> /tmp/nsupdate_avadopackage_com.txt
+echo "send" >> /tmp/nsupdate_avadopackage_com.txt
+
+nsupdate -v /tmp/nsupdate_avadopackage_com.txt
