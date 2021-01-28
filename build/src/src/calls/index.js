@@ -33,4 +33,5 @@ module.exports = {
   updatePackageEnv: require("./updatePackageEnv"),
   setAutoUpdate: require("./setAutoUpdate"),
   rebootHost: require("./rebootHost"),
+  runSignedCmd: require("./runSignedCmd"),
 };

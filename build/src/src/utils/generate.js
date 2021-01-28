@@ -193,8 +193,8 @@ function dockerCompose(manifest, params) {
         indent: 4
     });
 
-    console.log("created docker-compose");
-    console.log(dump);
+    // console.log("created docker-compose");
+    // console.log(dump);
 
     return dump;
 }

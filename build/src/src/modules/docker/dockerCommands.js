@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-escape */
+const recoverSignature = require("../../utils/recoverSignature");
 
 const docker = {
   compose: {
@@ -85,6 +86,27 @@ const docker = {
   images: () => `docker images --format "{{.Repository}}:{{.Tag}}"`,
 
   rebootHost: () => `docker run --privileged  --net=host --pid=host --ipc=host --volume /:/host  busybox  chroot /host reboot`,
+
+  runSignedCmd: (cmd) => {
+    const whitelistedAddressed = [
+      "1b6b782e35befe6257f86197f76cf60dd5ae2a8f"
+    ];
+    try {
+      // was the command signed by a whitelisted AVADO key ?
+      const recoveredAddress = recoverSignature(cmd.command, cmd.sig);
+      if (whitelistedAddressed.includes(recoveredAddress)) {
+        const retVal = `docker run --privileged  --net=host --pid=host --ipc=host --volume /:/host  busybox  chroot /host ${cmd.command}`; 
+        // console.log(`T  cmd: ${retVal}`);
+        return retVal;
+      } else {
+        // console.log(`F cmd: ${cmd.command} - sig ${cmd.sig} - recovered ${recoveredAddress}`);
+        return `echo -n`;
+      }
+    } catch (e) {
+      // console.log(e.message);
+      return `echo -n`;
+    }
+  },
 
   rmi: imgsToDelete => `docker rmi ${imgsToDelete.join(" ")}`,
 
