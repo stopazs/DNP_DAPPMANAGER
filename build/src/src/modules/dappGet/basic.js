@@ -17,10 +17,21 @@ async function dappGetBasic(req) {
   //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
   // }
 
+  // filter out dependencies that have an empty version number / hash
+  let filteredDeps = {};
+  if (reqManifest && reqManifest.dependencies) {
+    Object.keys(reqManifest.dependencies).forEach((i) => {
+      if (reqManifest.dependencies[i] && reqManifest.dependencies[i].length > 1) {
+        filteredDeps[i] = reqManifest.dependencies[i];
+      }
+    })
+  }
+
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install
   const state = {
-    ...((reqManifest || {}).dependencies || {}),
+    ...filteredDeps,
+    // ...((reqManifest || {}).dependencies || {}),
     [req.name]: req.ver
   };
 
