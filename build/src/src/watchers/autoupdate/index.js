@@ -16,12 +16,25 @@ const findLatestVersion = (store, packagename) => {
     return latestPackage ? {hash:latestPackage.manifesthash, manifest: latestPackage.manifest} : null;
 };
 
-const monitorUpdates = () => {
-    const r = calls.listPackages().then((res) => { return res.result });
+const monitorUpdates = async () => {
+    // get list of packages
+    const r = await calls.listPackages().then((res) => { return res.result });
+
+    // get basic info to request updates
+    const i = {
+        packages: r.map((i)=>{ return { name: i.name, version : i.version}}),
+        nodeid: await db.get("address"),
+    };
+
+    logs.info(`install info ${JSON.stringify(i)}`);
+
     const r2 = axios.get("https://bo.ava.do/value/store").then((res) => {
         const hash = JSON.parse(res.data).hash;
         return ipfs.cat(hash).then(JSON.parse);
     });
+
+    // eslint-disable-next-line no-console
+    //console.log(`packages`,i);
 
     Promise.all([
         r,
