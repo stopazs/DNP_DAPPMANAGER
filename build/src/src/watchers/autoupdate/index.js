@@ -7,13 +7,19 @@ const ipfs = require("../../modules/ipfs");
 const semver = require('semver');
 const db = require("../../db");
 const logs = require("logs.js")(module);
+const jayson = require('jayson');
+
+
+const rpcClient = new jayson.client.https({
+    host: "rpc.ava.do"
+});
 
 const findLatestVersion = (store, packagename) => {
+    if (!store || !store.packages){
+        return null;
+    }
     const latestPackage = store.packages.find((p) => { return p.manifest.name === packagename });
-    // if (!latestPackage){
-    //     console.log(`Cannot find latest version of ${packagename}`);
-    // }
-    return latestPackage ? {hash:latestPackage.manifesthash, manifest: latestPackage.manifest} : null;
+    return latestPackage ? { hash: latestPackage.manifesthash, manifest: latestPackage.manifest } : null;
 };
 
 const monitorUpdates = async () => {
@@ -22,19 +28,21 @@ const monitorUpdates = async () => {
 
     // get basic info to request updates
     const i = {
-        packages: r.map((i)=>{ return { name: i.name, version : i.version}}),
+        packages: r.map((i) => { return { name: i.name, version: i.version } }),
         nodeid: await db.get("address"),
     };
 
-    logs.info(`install info ${JSON.stringify(i)}`);
-
-    const r2 = axios.get("https://bo.ava.do/value/store").then((res) => {
-        const hash = JSON.parse(res.data).hash;
-        return ipfs.cat(hash).then(JSON.parse);
+    const r2 = rpcClient.request('store.getUpdates', i, (err, response) => {
+        if (err) {
+            return null;
+        }
+        if (response && response.result) {
+            const hash = JSON.parse(response.result).hash;
+            return ipfs.cat(hash).then(JSON.parse);
+        } else {
+            return null;
+        }
     });
-
-    // eslint-disable-next-line no-console
-    //console.log(`packages`,i);
 
     Promise.all([
         r,
@@ -47,13 +55,12 @@ const monitorUpdates = async () => {
                     // console.log(`${installedPackage.name} has autoupdates on`);
                     const latestVersion = findLatestVersion(store, installedPackage.name);
                     if (latestVersion && semver.gt(latestVersion.manifest.version, installedPackage.version)) {
-                        // console.log(`package ${installedPackage.name} needs update from ${installedPackage.version}->${latestVersion.manifest.version}`);
                         return (`${installedPackage.name}@${latestVersion.hash}`);
                     } else {
-                        // console.log(`no update. local=${installedPackage ? installedPackage.version : "unknown"}, store=${latestVersion ? latestVersion.version : "unknown"}`);
+                        console.log(`no update. local=${installedPackage ? installedPackage.version : "unknown"}, store=${latestVersion ? latestVersion.version : "unknown"}`);
                     }
                 } else {
-                    //		console.log(`no auto update for package ${installedPackage.name}`);
+                    console.log(`no auto update for package ${installedPackage.name}`);
                 }
                 return null;
             }));

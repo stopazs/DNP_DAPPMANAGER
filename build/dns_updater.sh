@@ -89,6 +89,18 @@ do
     	echo "update add ${name}.my.ava.do 60 A ${ip}" >> /tmp/nsupdate_my.ava.do.txt
     fi
 done
+# Core packages too plz
+for container in $(docker inspect -f '{{.Name}};{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q -f "name=DAppNodeCore-"))
+do
+    name=$(echo $container | awk -F ';' '{print $1}'| sed 's/DAppNodeCore-//g'| sed 's/\.dappnode\.eth//g' |  sed 's/\.dnp//g' |  sed 's/\.public//g'|  sed 's/\.avado//g' | tr -d '/_')
+    ip=$(echo $container | awk -F ';' '{print $2}'| tr -d '/_')
+    if [ ! -z "$ip" ]
+    then
+    	echo "update delete ${name}.my.ava.do A" >> /tmp/nsupdate_my.ava.do.txt
+    	echo "update add ${name}.my.ava.do 60 A ${ip}" >> /tmp/nsupdate_my.ava.do.txt
+    fi
+done
+
 echo "show" >> /tmp/nsupdate_my.ava.do.txt
 echo "send" >> /tmp/nsupdate_my.ava.do.txt
 
