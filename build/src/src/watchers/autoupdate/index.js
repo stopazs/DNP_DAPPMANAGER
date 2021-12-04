@@ -2,7 +2,6 @@
 
 // const params = require("../../params");
 const calls = require("../../calls");
-const axios = require("axios");
 const ipfs = require("../../modules/ipfs");
 const semver = require('semver');
 const db = require("../../db");
@@ -57,10 +56,10 @@ const monitorUpdates = async () => {
                     if (latestVersion && semver.gt(latestVersion.manifest.version, installedPackage.version)) {
                         return (`${installedPackage.name}@${latestVersion.hash}`);
                     } else {
-                        console.log(`no update. local=${installedPackage ? installedPackage.version : "unknown"}, store=${latestVersion ? latestVersion.version : "unknown"}`);
+                        // console.log(`no update. local=${installedPackage ? installedPackage.version : "unknown"}, store=${latestVersion ? latestVersion.version : "unknown"}`);
                     }
                 } else {
-                    console.log(`no auto update for package ${installedPackage.name}`);
+                    // console.log(`no auto update for package ${installedPackage.name}`);
                 }
                 return null;
             }));
