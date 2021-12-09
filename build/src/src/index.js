@@ -15,6 +15,10 @@ const { stringIncludes } = require("utils/strings");
 const calls = require("./calls");
 const generateKeys = require("./utils/generateKeys");
 
+//
+// const getExternalIp = require("./modules/upnpc/getExternalIp");
+const getInternalIp = require("./utils/getInternalIp");
+
 // Start watchers
 require("./watchers/chains");
 require("./watchers/diskUsage");
@@ -236,4 +240,29 @@ async function checkIfUpnpIsAvailable() {
       logs.error(`Error checking if UPnP device is available: ${e.stack}`);
     }
   }
+}
+
+getIp();
+async function getIp() {
+  // // external IP
+  // try {
+  //   const ip = await getExternalIp();
+  //   logs.info(`External IP retrieved: ${ip}`);
+
+  //   await db.set("ip", ip);
+  // } catch (e) {
+  //   logs.error(`Error getting external IP: ${e.stack}`);
+  // }
+
+  // internal IP
+  try {
+    const ip = await getInternalIp();
+    logs.info(`Internal IP retrieved: ${ip}`);
+
+    await db.set("internalip", ip);
+  } catch (e) {
+    logs.error(`Error getting internal IP: ${e.stack}`);
+  }
+
+
 }

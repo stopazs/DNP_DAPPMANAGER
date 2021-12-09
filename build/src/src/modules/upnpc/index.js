@@ -19,5 +19,5 @@
 module.exports = {
   open: require("./open"),
   close: require("./close"),
-  list: require("./list")
+  list: require("./list"),
 };
