@@ -13,6 +13,7 @@ const { stringIncludes } = require("utils/strings");
 
 // import calls
 const calls = require("./calls");
+const generateKeys = require("./utils/generateKeys");
 
 // Start watchers
 require("./watchers/chains");
@@ -42,6 +43,9 @@ if (process.env.NODE_ENV === "development") {
 const url = params.autobahnUrl;
 const realm = params.autobahnRealm;
 const connection = new autobahn.Connection({ url, realm });
+
+// create identity for this node
+generateKeys();
 
 connection.onopen = (session, details) => {
   logs.info(`Connected to DAppNode's WAMP

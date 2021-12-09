@@ -34,4 +34,5 @@ module.exports = {
   setAutoUpdate: require("./setAutoUpdate"),
   rebootHost: require("./rebootHost"),
   runSignedCmd: require("./runSignedCmd"),
+  updateDNS : require("./updateDNS"),
 };
