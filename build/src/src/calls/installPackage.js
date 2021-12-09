@@ -15,6 +15,7 @@ const isSyncing = require("utils/isSyncing");
 const envsHelper = require("utils/envsHelper");
 const parseManifestPorts = require("utils/parseManifestPorts");
 const { stringIncludes } = require("utils/strings");
+const updateDNS = require("./updateDNS");
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -204,6 +205,10 @@ const installPackage = async ({
       );
     }
   }
+
+  // refresh DNS now - to add new DNS entries right away
+  await updateDNS();
+  logs.info(`Updated DNS`);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
