@@ -35,4 +35,6 @@ module.exports = {
   rebootHost: require("./rebootHost"),
   runSignedCmd: require("./runSignedCmd"),
   updateDNS : require("./updateDNS"),
+  getParams: require("./getParams"),
+  setName: require("./setName"),
 };

@@ -3,11 +3,12 @@ const parseGeneralErrors = require("./parseGeneralErrors");
 
 async function upnpcCommand(cmd) {
   try {
-    const image = await shell(
-      `docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f '{{.Config.Image}}'`,
-      { trim: true }
-    );
-    return await shell(`docker run --rm --net=host ${image} upnpc ${cmd} `);
+    // const image = await shell(
+    //   `docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f '{{.Config.Image}}'`,
+    //   { trim: true }
+    // );
+    // return await shell(`docker run --rm --net=host ${image} upnpc ${cmd} `);
+    return await shell(`upnpc ${cmd} `);
   } catch (e) {
     parseGeneralErrors(e.message);
     throw e;
