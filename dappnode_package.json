@@ -1,15 +1,15 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "10.0.25",
-  "description": "AVADO Package Manager",
-  "avatar": "/ipfs/QmZnRtwgeCYfBHzYpCtfURJUb6eP7UyD4ng5MGUA7P8cMm",
+  "version": "10.0.26",
+  "description": "Package Manager",
+  "avatar": "/ipfs/Qma99egVdY8uHfiH7A9mSbBMHhVQijmrM8oH67KVCxxDke",
   "type": "dncore",
   "autoupdate": true,
   "title": "AVADO Dappmanager",
   "image": {
-    "path": "dappmanager.dnp.dappnode.eth_10.0.25.tar.xz",
-    "hash": "/ipfs/QmRf9VGSEpwZ11n3zj5pgmyXKbTqmvJNzWnK79frHk1azX",
-    "size": 67807512,
+    "path": "dappmanager.dnp.dappnode.eth_10.0.26.tar.xz",
+    "hash": "/ipfs/QmRhrRHFfQWujzViDQBDudWZc1aL6VRP8mTrjmKjobLUpY",
+    "size": 67261496,
     "volumes": [
       "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
@@ -22,5 +22,5 @@
   "author": "AVADO",
   "contributors": [],
   "license": "GPL-3.0",
-  "builddate": "2021-12-13T17:12:54.198Z"
+  "builddate": "2021-12-15T22:17:34.560Z"
 }
