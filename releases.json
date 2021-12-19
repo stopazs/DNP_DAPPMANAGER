@@ -154,5 +154,12 @@
     "uploadedTo": {
       "http://80.208.229.228:5001": "Mon, 13 Dec 2021 15:27:23 GMT"
     }
+  },
+  "10.0.26": {
+    "hash": "/ipfs/QmNxFxpGhZ7ooznfAeNxKjyqUU3jT7CFtZqGqhcSDo5qyf",
+    "type": "manifest",
+    "uploadedTo": {
+      "http://80.208.229.228:5001": "Wed, 15 Dec 2021 22:17:34 GMT"
+    }
   }
 }

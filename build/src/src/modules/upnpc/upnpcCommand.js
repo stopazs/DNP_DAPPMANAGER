@@ -8,7 +8,7 @@ async function upnpcCommand(cmd) {
     //   { trim: true }
     // );
     // return await shell(`docker run --rm --net=host ${image} upnpc ${cmd} `);
-    return await shell(`upnpc ${cmd} `);
+    return await shell(`docker run --rm --privileged  --net=host --pid=host --ipc=host --volume /:/host  busybox  chroot /host upnpc ${cmd} `);
   } catch (e) {
     parseGeneralErrors(e.message);
     throw e;
