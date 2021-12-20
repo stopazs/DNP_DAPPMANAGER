@@ -25,7 +25,7 @@ async function getParams() {
     name: _db.name || "AVADO",
     nodeid: _db.address,
     // staticIp: _db.staticIp,
-    // domain: _db.domain
+    domain: _db.domain
   };
 
   // Status parameteres

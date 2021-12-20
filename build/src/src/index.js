@@ -18,6 +18,7 @@ const generateKeys = require("./utils/generateKeys");
 //
 // const getExternalIp = require("./modules/upnpc/getExternalIp");
 const getInternalIp = require("./utils/getInternalIp");
+const getExternalIp = require("./utils/getExternalIp");
 
 // Start watchers
 require("./watchers/chains");
@@ -245,14 +246,13 @@ async function checkIfUpnpIsAvailable() {
 getIp();
 async function getIp() {
   // // external IP
-  // try {
-  //   const ip = await getExternalIp();
-  //   logs.info(`External IP retrieved: ${ip}`);
-
-  //   await db.set("ip", ip);
-  // } catch (e) {
-  //   logs.error(`Error getting external IP: ${e.stack}`);
-  // }
+  try {
+    const ip = await getExternalIp();
+    logs.info(`External IP retrieved: ${ip}`);
+    await db.set("ip", ip);
+  } catch (e) {
+    logs.error(`Error getting external IP: ${e.stack}`);
+  }
 
   // internal IP
   try {
