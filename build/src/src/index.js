@@ -223,11 +223,16 @@ logs.info(`Avado: Attempting WAMP connection to ${url}, realm: ${realm}`);
  */
 
 /**
- * 1. Query UPnP to check if it's available
+ * 1. Install miniupnpc , then query UPnP to check if it's available
  */
 checkIfUpnpIsAvailable();
 async function checkIfUpnpIsAvailable() {
   try {
+    // try installing upnpc on host
+    logs.info("check UPnP tools");
+    await upnpc.install();
+    
+    // then query it
     const currentPortMappings = await upnpc.list();
     logs.info("UPnP device available");
     logs.info(

@@ -3,7 +3,7 @@ const validateKwargs = require("./validateKwargs");
 const parseCloseOutput = require("./parseCloseOutput");
 
 /**
- * Opens port = maps requested port to host
+ * Closes port = maps requested port to host
  * Actual command example:
  *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -d 500 UDP
  *

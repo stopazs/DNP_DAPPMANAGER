@@ -156,10 +156,24 @@
     }
   },
   "10.0.26": {
-    "hash": "/ipfs/QmZxx2fgKrekYebavuNyBmAZvm3EdMm5DTjrYsoaNaJtzA",
+    "hash": "/ipfs/QmY4XTUjztssiWW6WWsfVFnHcaQVPLTFj2h1VwYdo9bz5c",
     "type": "manifest",
     "uploadedTo": {
-      "http://80.208.229.228:5001": "Sun, 19 Dec 2021 23:32:50 GMT"
+      "http://80.208.229.228:5001": "Mon, 27 Dec 2021 15:08:52 GMT"
+    }
+  },
+  "10.0.27": {
+    "hash": "/ipfs/QmbYEkMQSvB3Xqc6ezaGNCmaDNjf7pBBBSpzGiHBgCAxCN",
+    "type": "manifest",
+    "uploadedTo": {
+      "http://80.208.229.228:5001": "Mon, 27 Dec 2021 15:24:35 GMT"
+    }
+  },
+  "10.0.28": {
+    "hash": "/ipfs/QmVspHvUd7JMfGW8GMXQyJqB4tLXWGM6G6vAkCXrHkNgYw",
+    "type": "manifest",
+    "uploadedTo": {
+      "http://80.208.229.228:5001": "Tue, 28 Dec 2021 15:08:08 GMT"
     }
   }
 }
