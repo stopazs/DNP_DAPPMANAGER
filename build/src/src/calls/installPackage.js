@@ -184,10 +184,16 @@ const installPackage = async ({
     const lockedPortsToOpen = await lockPorts({ pkg });
     if (lockedPortsToOpen.length)
       logs.info(
-        `Locked ${lockedPortsToOpen.length} ports of DNP ${
-          pkg.name
+        `Locked ${lockedPortsToOpen.length} ports of DNP ${pkg.name
         }: ${JSON.stringify(lockedPortsToOpen)}`
       );
+
+    logs.info(
+      `mapped ports to open: ${JSON.stringify(mappedPortsToOpen)}`
+    );
+    logs.info(
+      `locked ports to open: ${JSON.stringify(lockedPortsToOpen)}`
+    );
 
     // Skip if there are no ports to open or if UPnP is not available
     const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
