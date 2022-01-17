@@ -1,8 +1,27 @@
 const parse = require("utils/parse");
 const dockerList = require("modules/dockerList");
-const docker = require("modules/docker");
+const docker = require("./docker/index.js");
 const getPath = require("utils/getPath");
 const params = require("params");
+const logs = require("logs.js")(module);
+
+
+function iterate(obj) {
+  for (var property in obj) {
+      if (obj.hasOwnProperty(property)) {
+          if (typeof obj[property] == "object") {
+              iterate(obj[property]);
+          }
+          else {
+            logs.info(`property ${property} type ${typeof obj[property]}`)
+          }
+      }
+  }
+}
+logs.info(`docker`)
+iterate(docker);
+
+
 
 /**
  * The goal of this module is to find out which port
@@ -170,6 +189,9 @@ async function lockPorts({ pkg, dockerComposePath }) {
   parse.writeDockerCompose(dockerComposePath, dc);
 
   // In order to apply the labels to the current container, re-up it
+  logs.info(`in function docker ${JSON.stringify(docker)}`)
+  logs.info(`in function docker.compose ${JSON.stringify(docker.compose)}`)
+
   await docker.compose.up(dockerComposePath);
 
   // Track and return host ports in case they have to be openned
