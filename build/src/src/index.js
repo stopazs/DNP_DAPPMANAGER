@@ -231,7 +231,7 @@ async function checkIfUpnpIsAvailable() {
     // try installing upnpc on host
     logs.info("check UPnP tools");
     await upnpc.install();
-    
+
     // then query it
     const currentPortMappings = await upnpc.list();
     logs.info("UPnP device available");
@@ -249,8 +249,9 @@ async function checkIfUpnpIsAvailable() {
 }
 
 getIp();
+
 async function getIp() {
-  // // external IP
+  // external IP
   try {
     const ip = await getExternalIp();
     logs.info(`External IP retrieved: ${ip}`);
@@ -258,16 +259,22 @@ async function getIp() {
   } catch (e) {
     logs.error(`Error getting external IP: ${e.stack}`);
   }
+}
 
+getIpLocal();
+
+async function getIpLocal() {
   // internal IP
   try {
     const ip = await getInternalIp();
-    logs.info(`Internal IP retrieved: ${ip}`);
-
-    await db.set("internalip", ip);
+    if (ip) {
+      logs.info(`Internal IP retrieved: ${ip}`);
+      await db.set("internalip", ip);
+    } else {
+      // retry every 5 seconds until we have it
+      setTimeout(getIpLocal, 5000);
+    }
   } catch (e) {
     logs.error(`Error getting internal IP: ${e.stack}`);
   }
-
-
 }

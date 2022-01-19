@@ -5,7 +5,6 @@ const logs = require("../logs.js")(module);
 async function getInternalIp({ silent } = {}) {
   try {
     const internalIp = await shell(
-      // `/sbin/ip route|awk '/default/ { print $3 }'`,
       `docker run --rm --net=host --pid=host --ipc=host --volume /:/host  busybox  chroot /host /sbin/ip route | grep -v 172 | grep -v default | awk '{ print $9 }'`,
       { trim: true }
     );
