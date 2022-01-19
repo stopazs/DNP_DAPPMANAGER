@@ -7,9 +7,9 @@
   "autoupdate": true,
   "title": "AVADO Dappmanager",
   "image": {
-    "path": "",
-    "hash": "",
-    "size": "",
+    "path": "dappmanager.dnp.dappnode.eth_10.0.30.tar.xz",
+    "hash": "/ipfs/Qmf5MHLgyKZdMSC1xwDkQcH2ADWXVh7TkJF2y3HvNhXR2J",
+    "size": 68406592,
     "volumes": [
       "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
@@ -22,5 +22,5 @@
   "author": "AVADO",
   "contributors": [],
   "license": "GPL-3.0",
-  "builddate": "2022-01-19T18:49:11.599Z"
+  "builddate": "2022-01-19T18:58:52.771Z"
 }
