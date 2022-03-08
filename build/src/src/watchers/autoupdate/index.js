@@ -14,7 +14,7 @@ const rpcClient = new jayson.client.https({
 });
 
 const findLatestVersion = (store, packagename) => {
-    if (!store || !store.packages){
+    if (!store || !store.packages) {
         return null;
     }
     const latestPackage = store.packages.find((p) => { return p.manifest.name === packagename });
@@ -23,67 +23,72 @@ const findLatestVersion = (store, packagename) => {
 
 const monitorUpdates = async () => {
     // get list of packages
-    const r = await calls.listPackages().then((res) => { return res.result });
+    logs.info(`fetching installed packages`);
+    const packageList = await calls.listPackages().then((res) => { return res.result });
 
-    // get basic info to request updates
+    // compile request to get package updates from the store
     const i = {
-        packages: r.map((i) => { return { name: i.name, version: i.version } }),
+        packages: packageList.map((i) => { return { name: i.name, version: i.version } }),
         nodeid: await db.get("address"),
     };
+    // logs.info(`installed packages ${JSON.stringify(i, null, 2)}`);
 
-    const r2 = rpcClient.request('store.getUpdates', i, (err, response) => {
+    // fetch updated packages from the store
+    rpcClient.request('store.getUpdates', i, async (err, response) => {
         if (err) {
-            return null;
+            logs.info(`store.getUpdates returned error ${err.message}`);
         }
-        if (response && response.result) {
-            const hash = JSON.parse(response.result).hash;
-            return ipfs.cat(hash).then(JSON.parse);
-        } else {
-            return null;
-        }
-    });
 
-    Promise.all([
-        r,
-        r2]).then(async ([packageList, store]) => {
-            const upgrades = Promise.all(packageList.map(async (installedPackage) => {
+        if (response && response.result) {
+            // get the store hash & download the the store from IPFS
+            const hash = JSON.parse(response.result).hash;
+            const store = await ipfs.cat(hash).then(JSON.parse);
+
+            // get list of packages to upgrade
+            const upgrades = await Promise.all(packageList.map(async (installedPackage) => {
                 const dbKey = `autoupdate-${installedPackage.name.replace(/\./g, "_")}`;
                 const autoUpdateDB = await db.get(dbKey);
                 const autoUpdate = autoUpdateDB === undefined ? installedPackage.manifest.autoupdate || false : autoUpdateDB;
                 if (autoUpdate === true) {
-                    // console.log(`${installedPackage.name} has autoupdates on`);
+                    // logs.info(`${installedPackage.name} has autoupdates on`);
                     const latestVersion = findLatestVersion(store, installedPackage.name);
+                    // logs.info(`latestVersion of ${installedPackage.name} is ${JSON.stringify(latestVersion, null, 2)}`);
                     if (latestVersion && semver.gt(latestVersion.manifest.version, installedPackage.version)) {
+                        logs.info(`package ${installedPackage.name} requires an update from ${installedPackage.version} -> ${latestVersion.manifest.version}`);
                         return (`${installedPackage.name}@${latestVersion.hash}`);
                     } else {
-                        // console.log(`no update. local=${installedPackage ? installedPackage.version : "unknown"}, store=${latestVersion ? latestVersion.version : "unknown"}`);
+                        logs.info(`no update for package ${installedPackage.name}. local=${installedPackage ? installedPackage.version : "unknown"}, store=${latestVersion ? latestVersion.manifest.version : "unknown"}`);
                     }
                 } else {
-                    // console.log(`no auto update for package ${installedPackage.name}`);
+                    logs.info(`auto update disabled for package ${installedPackage.name}`);
                 }
                 return null;
             }));
 
-            upgrades.then((upgradeList) => {
-                const toUpgrade = upgradeList.reduce((accum, item) => {
-                    item && accum.push(item);
-                    return accum;
-                }, [])
-                // console.log(toUpgrade);
-                if (toUpgrade.length > 0) {
-                    // pick random item
-                    var item = toUpgrade[Math.floor(Math.random() * toUpgrade.length)];
-                    logs.info(`update package ${item}`);
-                    calls.installPackage({ id: item }).then(() => { logs.info(`installed package ${item}`) });
+            // remove packages that need no update
+            const toUpgrade = upgrades.reduce((accum, item) => {
+                item && accum.push(item);
+                return accum;
+            }, []);
 
-                }
-            });
-        });
+            // pick random item & only update that one in this run
+            if (toUpgrade.length > 0) {
+                logs.info(`packages to upgrade ${JSON.stringify(toUpgrade, null, 2)}`);
+                var item = toUpgrade[Math.floor(Math.random() * toUpgrade.length)];
+                logs.info(`package selected for update: update package ${item}`);
+                calls.installPackage({ id: item }).then(() => { logs.info(`installed package ${item}`) });
+            }
+
+        } else {
+            logs.info(`store.getUpdates returned empty result`);
+        }
+    });
 };
-
+logs.info(`starting auto-updater`);
 const monitoringInterval = 60 * 60 * 1000; // (ms) (1 hour)
 monitorUpdates();
 setInterval(() => {
+    logs.info(`running auto-updater`);
     monitorUpdates();
 }, monitoringInterval);
 
