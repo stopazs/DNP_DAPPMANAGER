@@ -1,4 +1,4 @@
-FROM node:10.15.3-alpine as build
+FROM --platform=linux/amd64 node:10.15.3-alpine as build
 
 RUN apk add --no-cache git python build-base bind-tools docker bash jq
 
@@ -18,7 +18,7 @@ COPY dappnode_package.json .
 RUN ./getVersionData.sh
 
 # This results in a single layer image
-FROM node:10.15.3-alpine
+FROM --platform=linux/amd64 node:10.15.3-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.20.1
 
@@ -57,6 +57,19 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
 
 RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
+
+
+# Files for updating legacy Docker installations on the host
+# Debian Buster (10)
+ADD https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64/containerd.io_1.4.4-1_amd64.deb /update/buster/
+ADD https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64/docker-ce-cli_20.10.17~3-0~debian-buster_amd64.deb /update/buster/
+ADD https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64/docker-ce_20.10.17~3-0~debian-buster_amd64.deb /update/buster/
+# Debian Bullseye (11)
+ADD https://download.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/containerd.io_1.4.4-1_amd64.deb /update/bullseye/
+ADD https://download.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/docker-ce_20.10.17~3-0~debian-bullseye_amd64.deb /update/bullseye/
+ADD https://download.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/docker-ce-cli_20.10.17~3-0~debian-bullseye_amd64.deb /update/bullseye/
+ADD build/updateAvadoHost.sh /update/
+RUN chmod +x /update/updateAvadoHost.sh
 
 # Copy files and do things that can change
 
