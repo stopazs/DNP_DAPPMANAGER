@@ -11,7 +11,7 @@ const { stringIncludes } = require("utils/strings");
  *
  * @param {string} id DNP .eth name
  */
-async function restartPackageVolumes({ id }) {
+async function restartPackageVolumes({ id, timeout = 60 }) {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnpList = await dockerList.listContainers();
@@ -36,7 +36,7 @@ async function restartPackageVolumes({ id }) {
 
   if (dnp.isCore) {
     // docker-compose down can't be called because of the shared network
-    await docker.compose.rm(dockerComposePath);
+    await docker.compose.rm(dockerComposePath, { timeout });
     await docker.volume.rm(dnp.volumes.map(v => v.name).join(" "));
   } else {
     await docker.compose.down(dockerComposePath, { volumes: true });

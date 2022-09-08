@@ -10,7 +10,7 @@ const { eventBus, eventBusTag } = require("eventBus");
  *
  * @param {string} id DNP .eth name
  */
-const restartPackage = async ({ id }) => {
+const restartPackage = async ({ id, timeout = 60 }) => {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
@@ -23,7 +23,7 @@ const restartPackage = async ({ id }) => {
   }
 
   // Combining rm && up doesn't prevent the installer from crashing
-  await docker.compose.rm(dockerComposePath);
+  await docker.compose.rm(dockerComposePath, { timeout });
   await docker.safe.compose.up(dockerComposePath);
 
   // Emit packages update
