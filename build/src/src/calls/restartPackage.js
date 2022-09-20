@@ -10,7 +10,7 @@ const { eventBus, eventBusTag } = require("eventBus");
  *
  * @param {string} id DNP .eth name
  */
-const restartPackage = async ({ id, timeout = 60 }) => {
+const restartPackage = async ({ id, timeout = 180 }) => {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);

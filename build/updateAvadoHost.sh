@@ -18,6 +18,8 @@ fi
 if ! grep -q "updateAvadoHost.sh" "/etc/rc.local"; then
     echo "Adding updateAvadoHost.sh to /etc/rc.local" >> ${LOGFILE}
     sed -i '$i/root/update/updateAvadoHost.sh' /etc/rc.local
+    # If geth is running, git it enough time to cleanly shut down
+    docker stop DAppNodePackage-ethchain-geth.public.dappnode.eth -t 180
     # reboot
     reboot
     exit

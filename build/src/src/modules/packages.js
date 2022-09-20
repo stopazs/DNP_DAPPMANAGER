@@ -90,7 +90,7 @@ async function download({ pkg, id }) {
  * - id: task id to allow progress updates
  * @returns {*}
  */
-async function run({ pkg, id, timeout = 60 }) {
+async function run({ pkg, id, timeout = 180 }) {
   const { name, manifest } = pkg;
   const { isCore, version } = manifest;
   const dockerComposePath = getPath.dockerCompose(name, params, isCore);

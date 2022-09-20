@@ -10,7 +10,7 @@ const { eventBus, eventBusTag } = require("eventBus");
  * @param {string} id DNP .eth name
  * @param {number} timeout seconds to stop the package
  */
-const togglePackage = async ({ id, timeout = 60 }) => {
+const togglePackage = async ({ id, timeout = 180 }) => {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
