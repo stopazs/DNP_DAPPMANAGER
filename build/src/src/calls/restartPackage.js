@@ -23,7 +23,8 @@ const restartPackage = async ({ id, timeout = 180 }) => {
   }
 
   // Combining rm && up doesn't prevent the installer from crashing
-  await docker.compose.rm(dockerComposePath, { timeout });
+  await docker.compose.stop(dockerComposePath, { timeout });
+  await docker.compose.rm(dockerComposePath);
   await docker.safe.compose.up(dockerComposePath);
 
   // Emit packages update
