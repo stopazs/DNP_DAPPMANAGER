@@ -90,7 +90,7 @@ async function download({ pkg, id }) {
  * - id: task id to allow progress updates
  * @returns {*}
  */
-async function run({ pkg, id }) {
+async function run({ pkg, id, timeout = 180 }) {
   const { name, manifest } = pkg;
   const { isCore, version } = manifest;
   const dockerComposePath = getPath.dockerCompose(name, params, isCore);
@@ -100,7 +100,7 @@ async function run({ pkg, id }) {
   if (name == "dappmanager.dnp.dappnode.eth") {
     await restartPatch(name + ":" + version);
   } else {
-    await docker.compose.up(dockerComposePath);
+    await docker.compose.up(dockerComposePath, { timeout });
   }
 
   // Clean old images. This command can throw errors.
