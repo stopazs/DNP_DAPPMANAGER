@@ -39,6 +39,8 @@ if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
         dpkg -i ${pack}
     done
     popd
+    echo "Update finished. Rebooting" >> ${LOGFILE}
+    reboot
 else
     echo "OK" >> ${LOGFILE}
 fi
