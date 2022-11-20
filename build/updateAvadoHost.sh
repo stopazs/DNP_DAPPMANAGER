@@ -8,6 +8,8 @@
 LOGFILE=/root/update/log.txt
 date >> ${LOGFILE}
 
+cat ${LOGFILE}
+
 # Am I in RC.local already?
 if [ ! -f /etc/rc.local ]; then
     echo "#!/bin/sh -e" >>/etc/rc.local
@@ -39,8 +41,14 @@ if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
         dpkg -i ${pack}
     done
     popd
-    echo "Update finished. Rebooting" >> ${LOGFILE}
-    reboot
+    echo "Update finished." >> ${LOGFILE}
+    sleep 60
+    if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
+        echo "Update failed." >> ${LOGFILE}
+    else
+        echo "Update succeeded." >> ${LOGFILE}
+        # reboot
+    fi
 else
     echo "OK" >> ${LOGFILE}
 fi
