@@ -6,7 +6,7 @@
 # This way this scripts really runs on the host without using docker sockets.
 
 LOGFILE=/root/update/log.txt
-date >> ${LOGFILE}
+date | tee -a ${LOGFILE}
 
 # Am I in RC.local already?
 if [ ! -f /etc/rc.local ]; then
@@ -16,7 +16,7 @@ if [ ! -f /etc/rc.local ]; then
     systemctl start rc-local
 fi
 if ! grep -q "updateAvadoHost.sh" "/etc/rc.local"; then
-    echo "Adding updateAvadoHost.sh to /etc/rc.local" >> ${LOGFILE}
+    echo "Adding updateAvadoHost.sh to /etc/rc.local" | tee -a ${LOGFILE}
     sed -i '$i/root/update/updateAvadoHost.sh' /etc/rc.local
     # If geth is running, git it enough time to cleanly shut down
     docker stop DAppNodePackage-ethchain-geth.public.dappnode.eth -t 180
@@ -31,16 +31,27 @@ fi
 DOCKER_VERSION=$(docker --version | sed -n "s/Docker version \([0-9\.]*\),.*/\1/p")
 DEBIAN_CODENAME=$(lsb_release -c | cut -d ":" -f 2 | xargs) # buster or bullseye
 
-echo -n "Check Docker update: " >> ${LOGFILE}
+echo -n "Check Docker update: " | tee -a ${LOGFILE}
 if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
-    echo "Update required. Updating" >> ${LOGFILE}
+    echo "Update required. Updating" | tee ${LOGFILE}
+    sleep 5
     pushd /root/update/${DEBIAN_CODENAME}
     for pack in containerd.io_*.deb docker-ce-cli_*.deb docker-ce_*.deb; do #sequence is important
+        echo "Installing ${pack}" | tee -a ${LOGFILE}
         dpkg -i ${pack}
+        sleep 5
     done
     popd
-    echo "Update finished. Rebooting" >> ${LOGFILE}
-    reboot
+    echo "Update finished." | tee -a ${LOGFILE}
+    sleep 5
+    if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
+        echo "Update failed." | tee -a ${LOGFILE}
+    else
+        echo "Update succeeded." | tee -a ${LOGFILE}
+        # reboot
+    fi
 else
-    echo "OK" >> ${LOGFILE}
+    echo "OK"
+    echo "OK" | tee -a ${LOGFILE}
+    sleep 5
 fi
