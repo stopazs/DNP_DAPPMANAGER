@@ -33,9 +33,11 @@ DEBIAN_CODENAME=$(lsb_release -c | cut -d ":" -f 2 | xargs) # buster or bullseye
 
 echo -n "Check Docker update: " | tee -a ${LOGFILE}
 if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
+    echo "current docker version: ${DOCKER_VERSION}"
     echo "Update required. Updating" | tee ${LOGFILE}
     sleep 5
     pushd /root/update/${DEBIAN_CODENAME}
+    # update docker by installing new packages
     for pack in containerd.io_*.deb docker-ce-cli_*.deb docker-ce_*.deb; do #sequence is important
         echo "Installing ${pack}" | tee -a ${LOGFILE}
         dpkg -i ${pack}
@@ -44,14 +46,17 @@ if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
     popd
     echo "Update finished." | tee -a ${LOGFILE}
     sleep 5
+    # Check Docker version after update
+    DOCKER_VERSION=$(docker --version | sed -n "s/Docker version \([0-9\.]*\),.*/\1/p")
+    echo "Docker version after update: ${DOCKER_VERSION}"
     if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
         echo "Update failed." | tee -a ${LOGFILE}
     else
+        # on successful update - reboot node once again
         echo "Update succeeded." | tee -a ${LOGFILE}
-        # reboot
+        reboot
     fi
 else
-    echo "OK"
     echo "OK" | tee -a ${LOGFILE}
     sleep 5
 fi
