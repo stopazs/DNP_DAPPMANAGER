@@ -5,6 +5,21 @@
 # We do this by first adding this script to /etc/rc.local and rebooting.
 # This way this scripts really runs on the host without using docker sockets.
 
+# Wait for any other dpkg process holding the lock
+lock_wait () {
+  while lsof /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+    sleep 1
+  done
+  while lsof /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
+    sleep 1
+  done
+  if [ -f /var/log/unattended-upgrades/unattended-upgrades.log ]; then
+    while lsof /var/log/unattended-upgrades/unattended-upgrades.log >/dev/null 2>&1 ; do
+      sleep 1
+    done
+  fi
+}
+
 LOGFILE=/root/update/log.txt
 date | tee -a ${LOGFILE}
 
@@ -32,6 +47,7 @@ DOCKER_VERSION=$(docker --version | sed -n "s/Docker version \([0-9\.]*\),.*/\1/
 DEBIAN_CODENAME=$(lsb_release -c | cut -d ":" -f 2 | xargs) # buster or bullseye
 
 echo -n "Check Docker update: " | tee -a ${LOGFILE}
+lock_wait
 if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
     echo "current docker version: ${DOCKER_VERSION}" | tee -a ${LOGFILE}
     echo "Update required. Updating" | tee -a ${LOGFILE}
@@ -40,16 +56,19 @@ if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
     # update docker by installing new packages
     for pack in containerd.io_*.deb docker-ce_*.deb docker-ce-cli_*.deb; do #sequence is important
         echo "Installing ${pack}" | tee -a ${LOGFILE}
+        lock_wait
         dpkg -i ${pack} 2>&1 | tee -a ${LOGFILE}
         sleep 5
     done
     popd
+    lock_wait
     dpkg --configure -a  2>&1 | tee -a ${LOGFILE}
     echo "Update finished." | tee -a ${LOGFILE}
     sleep 5
     # Check Docker version after update
     DOCKER_VERSION=$(docker --version | sed -n "s/Docker version \([0-9\.]*\),.*/\1/p")
     echo "Docker version after update: ${DOCKER_VERSION}"
+    lock_wait
     if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
         echo "Update failed." | tee -a ${LOGFILE}
     else
@@ -59,5 +78,4 @@ if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
     fi
 else
     echo "OK" | tee -a ${LOGFILE}
-    sleep 5
 fi
