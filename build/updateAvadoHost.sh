@@ -38,12 +38,13 @@ if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
     sleep 5
     pushd /root/update/${DEBIAN_CODENAME}
     # update docker by installing new packages
-    for pack in containerd.io_*.deb docker-ce-cli_*.deb docker-ce_*.deb; do #sequence is important
+    for pack in containerd.io_*.deb docker-ce_*.deb docker-ce-cli_*.deb; do #sequence is important
         echo "Installing ${pack}" | tee -a ${LOGFILE}
-        dpkg -i ${pack}
+        dpkg -i ${pack} 2>&1 | tee -a ${LOGFILE}
         sleep 5
     done
     popd
+    dpkg --configure -a  2>&1 | tee -a ${LOGFILE}
     echo "Update finished." | tee -a ${LOGFILE}
     sleep 5
     # Check Docker version after update
