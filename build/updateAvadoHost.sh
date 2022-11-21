@@ -18,7 +18,7 @@ fi
 if ! grep -q "updateAvadoHost.sh" "/etc/rc.local"; then
     echo "Adding updateAvadoHost.sh to /etc/rc.local" | tee -a ${LOGFILE}
     sed -i '$i/root/update/updateAvadoHost.sh' /etc/rc.local
-    # If geth is running, git it enough time to cleanly shut down
+    # If geth is running, give it enough time to cleanly shut down
     docker stop DAppNodePackage-ethchain-geth.public.dappnode.eth -t 180
     # reboot
     reboot
@@ -33,8 +33,8 @@ DEBIAN_CODENAME=$(lsb_release -c | cut -d ":" -f 2 | xargs) # buster or bullseye
 
 echo -n "Check Docker update: " | tee -a ${LOGFILE}
 if dpkg --compare-versions "${DOCKER_VERSION}" "lt" "20.10.17"; then
-    echo "current docker version: ${DOCKER_VERSION}"
-    echo "Update required. Updating" | tee ${LOGFILE}
+    echo "current docker version: ${DOCKER_VERSION}" | tee -a ${LOGFILE}
+    echo "Update required. Updating" | tee -a ${LOGFILE}
     sleep 5
     pushd /root/update/${DEBIAN_CODENAME}
     # update docker by installing new packages
