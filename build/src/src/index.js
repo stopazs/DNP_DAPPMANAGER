@@ -14,9 +14,6 @@ const { stringIncludes } = require("utils/strings");
 // import calls
 const calls = require("./calls");
 const generateKeys = require("./utils/generateKeys");
-
-//
-// const getExternalIp = require("./modules/upnpc/getExternalIp");
 const getInternalIp = require("./utils/getInternalIp");
 const getExternalIp = require("./utils/getExternalIp");
 
@@ -230,7 +227,6 @@ async function checkIfUpnpIsAvailable() {
   try {
     // try installing upnpc on host
     logs.info("check UPnP tools");
-    await upnpc.install();
 
     // then query it
     const currentPortMappings = await upnpc.list();
@@ -254,7 +250,6 @@ async function getIp() {
   // external IP
   try {
     const ip = await getExternalIp();
-    logs.info(`External IP retrieved: ${ip}`);
     await db.set("ip", ip);
   } catch (e) {
     logs.error(`Error getting external IP: ${e.stack}`);
@@ -268,7 +263,6 @@ async function getIpLocal() {
   try {
     const ip = await getInternalIp();
     if (ip) {
-      logs.info(`Internal IP retrieved: ${ip}`);
       await db.set("internalip", ip);
     } else {
       // retry every 5 seconds until we have it

@@ -20,5 +20,4 @@ module.exports = {
   open: require("./open"),
   close: require("./close"),
   list: require("./list"),
-  install: require("./upnpcInstall"),
 };
