@@ -10,12 +10,22 @@ const params = require("./params");
 const db = require("./db");
 const upnpc = require("./modules/upnpc");
 const { stringIncludes } = require("utils/strings");
+const express = require('express');
 
 // import calls
 const calls = require("./calls");
 const generateKeys = require("./utils/generateKeys");
 const getInternalIp = require("./utils/getInternalIp");
 const getExternalIp = require("./utils/getExternalIp");
+
+// Create JWT
+calls.createJWT();
+
+// serve local files from FILE_PATH (for JWT, certificates)
+const app = express();
+app.use(express.static(process.env.FILE_PATH));
+app.listen(80);
+logs.info(`Started static file server`);
 
 // Start watchers
 require("./watchers/chains");
