@@ -37,4 +37,5 @@ module.exports = {
   updateDNS : require("./updateDNS"),
   getParams: require("./getParams"),
   setName: require("./setName"),
+  createJWT: require("./createJWT"),
 };
